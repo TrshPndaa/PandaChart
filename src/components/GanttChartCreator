@@ -1,0 +1,240 @@
+import React, { useState, useEffect } from 'react';
+import { Plus, Trash2, Calendar, Users } from 'lucide-react';
+
+const GanttChartCreator = ({ existingProject = null, onSave, onCancel }) => {
+  const [formData, setFormData] = useState({
+    name: '',
+    description: '',
+    teamSize: 1,
+    dueDate: '',
+    status: 'planning',
+    tasks: []
+  });
+
+  const [newTask, setNewTask] = useState({
+    name: '',
+    startDate: '',
+    duration: 1,
+    progress: 0,
+    color: '#4F46E5'
+  });
+
+  useEffect(() => {
+    if (existingProject) {
+      setFormData(existingProject);
+    }
+  }, [existingProject]);
+
+  const handleInputChange = (e) => {
+    const { name, value } = e.target;
+    setFormData(prev => ({
+      ...prev,
+      [name]: value
+    }));
+  };
+
+  const handleAddTask = () => {
+    if (!newTask.name || !newTask.startDate) return;
+
+    setFormData(prev => ({
+      ...prev,
+      tasks: [...prev.tasks, { ...newTask, id: Date.now() }]
+    }));
+
+    setNewTask({
+      name: '',
+      startDate: '',
+      duration: 1,
+      progress: 0,
+      color: '#4F46E5'
+    });
+  };
+
+  const handleRemoveTask = (taskId) => {
+    setFormData(prev => ({
+      ...prev,
+      tasks: prev.tasks.filter(task => task.id !== taskId)
+    }));
+  };
+
+  const handleSubmit = (e) => {
+    e.preventDefault();
+    onSave(formData);
+  };
+
+  return (
+    <div className="p-6 bg-white rounded-lg shadow-xl max-w-2xl w-full mx-auto">
+      <h2 className="text-2xl font-bold mb-6">
+        {existingProject ? 'Edit Project' : 'Create New Project'}
+      </h2>
+
+      <form onSubmit={handleSubmit} className="space-y-6">
+        <div className="space-y-4">
+          <div>
+            <label className="block text-sm font-medium text-gray-700">
+              Project Name
+            </label>
+            <input
+              type="text"
+              name="name"
+              value={formData.name}
+              onChange={handleInputChange}
+              className="mt-1 block w-full rounded-md border border-gray-300 px-3 py-2"
+              required
+            />
+          </div>
+
+          <div>
+            <label className="block text-sm font-medium text-gray-700">
+              Description
+            </label>
+            <textarea
+              name="description"
+              value={formData.description}
+              onChange={handleInputChange}
+              rows={3}
+              className="mt-1 block w-full rounded-md border border-gray-300 px-3 py-2"
+            />
+          </div>
+
+          <div className="grid grid-cols-2 gap-4">
+            <div>
+              <label className="block text-sm font-medium text-gray-700">
+                Team Size
+              </label>
+              <div className="mt-1 relative rounded-md shadow-sm">
+                <div className="absolute inset-y-0 left-0 pl-3 flex items-center">
+                  <Users className="h-5 w-5 text-gray-400" />
+                </div>
+                <input
+                  type="number"
+                  name="teamSize"
+                  min="1"
+                  value={formData.teamSize}
+                  onChange={handleInputChange}
+                  className="block w-full pl-10 rounded-md border border-gray-300 px-3 py-2"
+                />
+              </div>
+            </div>
+
+            <div>
+              <label className="block text-sm font-medium text-gray-700">
+                Due Date
+              </label>
+              <div className="mt-1 relative rounded-md shadow-sm">
+                <div className="absolute inset-y-0 left-0 pl-3 flex items-center">
+                  <Calendar className="h-5 w-5 text-gray-400" />
+                </div>
+                <input
+                  type="date"
+                  name="dueDate"
+                  value={formData.dueDate}
+                  onChange={handleInputChange}
+                  className="block w-full pl-10 rounded-md border border-gray-300 px-3 py-2"
+                  required
+                />
+              </div>
+            </div>
+          </div>
+
+          <div>
+            <label className="block text-sm font-medium text-gray-700">
+              Status
+            </label>
+            <select
+              name="status"
+              value={formData.status}
+              onChange={handleInputChange}
+              className="mt-1 block w-full rounded-md border border-gray-300 px-3 py-2"
+            >
+              <option value="planning">Planning</option>
+              <option value="in-progress">In Progress</option>
+              <option value="completed">Completed</option>
+            </select>
+          </div>
+        </div>
+
+        {/* Tasks Section */}
+        <div className="space-y-4">
+          <h3 className="text-lg font-medium text-gray-900">Tasks</h3>
+          
+          <div className="grid grid-cols-2 gap-4">
+            <input
+              type="text"
+              placeholder="Task name"
+              value={newTask.name}
+              onChange={(e) => setNewTask(prev => ({ ...prev, name: e.target.value }))}
+              className="rounded-md border border-gray-300 px-3 py-2"
+            />
+            <input
+              type="date"
+              value={newTask.startDate}
+              onChange={(e) => setNewTask(prev => ({ ...prev, startDate: e.target.value }))}
+              className="rounded-md border border-gray-300 px-3 py-2"
+            />
+            <div className="flex items-center space-x-2">
+              <input
+                type="number"
+                min="1"
+                value={newTask.duration}
+                onChange={(e) => setNewTask(prev => ({ ...prev, duration: parseInt(e.target.value) }))}
+                className="w-20 rounded-md border border-gray-300 px-3 py-2"
+              />
+              <span className="text-gray-600">days</span>
+            </div>
+            <button
+              type="button"
+              onClick={handleAddTask}
+              className="flex items-center justify-center space-x-2 bg-indigo-600 text-white rounded-md px-4 py-2 hover:bg-indigo-700"
+            >
+              <Plus size={16} />
+              <span>Add Task</span>
+            </button>
+          </div>
+
+          {/* Task List */}
+          <div className="space-y-3">
+            {formData.tasks.map((task) => (
+              <div
+                key={task.id}
+                className="flex items-center justify-between p-3 bg-gray-50 rounded-lg"
+              >
+                <div>
+                  <p className="font-medium">{task.name}</p>
+                  <p className="text-sm text-gray-500">
+                    Starts: {task.startDate} ({task.duration} days)
+                  </p>
+                </div>
+                <button
+                  type="button"
+                  onClick={() => handleRemoveTask(task.id)}
+                  className="text-red-500 hover:text-red-700"
+                >
+                  <Trash2 size={18} />
+                </button>
+              </div>
+            ))}
+          </div>
+        </div>
+
+        <div className="flex justify-end space-x-4">
+          <button
+            type="button"
+            onClick={onCancel}
+            className="px-4 py-2 border border-gray-300 rounded-md text-gray-700 hover:bg-gray-50"
+          >
+            Cancel
+          </button>
+          <button
+            type="submit"
+            className="px-4 py-2 bg-indigo-600 text-white rounded-md hover:bg-indigo-700"
+          >
+            {existingProject ? 'Update Project' : 'Create Project'}
+          </button>
+        </div>
+      </form>
+    </div>
+  );
+};
+
+export default GanttChartCreator;

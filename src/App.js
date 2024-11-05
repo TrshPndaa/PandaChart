@@ -7,6 +7,7 @@ import "@fontsource/space-grotesk/600.css";
 import "@fontsource/space-grotesk/700.css";
 import Home from './home.js';
 import AuthForm from './components/AuthForm.js';
+import ProjectDashboard from './components/dashboard.js';
 
 function App() {
   return (
@@ -14,8 +15,7 @@ function App() {
       <Routes>
         <Route path="/" element={<Home />} />
         <Route path="/auth" element={<AuthForm />} />
-
-
+        <Route path="/dashboard" element={<ProjectDashboard />} />
       </Routes>
     </Router>
   );

@@ -1,7 +1,10 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { Menu, X } from 'lucide-react';
 
 function Navigation() {
+  const navigate = useNavigate();
+
   const [isScrolled, setIsScrolled] = useState(false);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
 
@@ -35,7 +38,7 @@ function Navigation() {
           </div>
         </div>
 
-        <button className="try-now-button">
+        <button className="try-now-button" onClick={() => navigate('/Auth')}>
           Try Now!
         </button>
 

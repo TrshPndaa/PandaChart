@@ -37,7 +37,7 @@ const AuthForm = () => {
 
       const data = await response.json();
       localStorage.setItem('token', data.token);
-      window.location.href = '/dashboard';
+      window.location.href = 'dashboard';
     } catch (err) {
       console.error('Auth error:', err);
       setError(err.message || 'Failed to connect to the server. Please try again later.');
